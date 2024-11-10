@@ -5,7 +5,7 @@ import {
   GiCactus,
   GiCastle,
   GiCaveEntrance,
-  GiForestCamp,
+  GiForestCamp,   
   GiIsland,
   GiWindmill,
 } from 'react-icons/gi'
