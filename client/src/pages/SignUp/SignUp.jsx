@@ -8,7 +8,7 @@ import { TbFidgetSpinner } from "react-icons/tb";
 
 const SignUp = () => {
   const navigate = useNavigate()
-  const {createUser, updateUserProfile, loading, setLoading} = useAuth();
+  const {createUser, updateUserProfile, signInWithGoogle, loading, setLoading} = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -40,6 +40,19 @@ const SignUp = () => {
     }catch(err){
       console.log(err)
       toast.error(err.message)
+    }
+  }
+
+  const handleGoogleSignIn = async () =>{
+    try{
+     await signInWithGoogle()
+
+     navigate('/')
+      toast.success('Signup Successfully')
+
+    }catch(err){
+      console.log(err)
+      console.log(err.message)
     }
   }
   return (
@@ -127,11 +140,15 @@ const SignUp = () => {
           </p>
           <div className='flex-1 h-px sm:w-16 dark:bg-gray-700'></div>
         </div>
-        <div className='flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer'>
+        
+        <button
+        disabled={loading}
+        onClick={handleGoogleSignIn}
+         className='disabled:cursor-not-allowed flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer'>
           <FcGoogle size={32} />
 
           <p>Continue with Google</p>
-        </div>
+        </button>
         <p className='px-6 text-sm text-center text-gray-400'>
           Already have an account?{' '}
           <Link
