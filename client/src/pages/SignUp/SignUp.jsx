@@ -1,7 +1,47 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FcGoogle } from 'react-icons/fc'
+import useAuth from '../../hooks/useAuth'
+import axios from 'axios';
+import toast from 'react-hot-toast'
+import { TbFidgetSpinner } from "react-icons/tb";
+
 
 const SignUp = () => {
+  const navigate = useNavigate()
+  const {createUser, updateUserProfile, loading, setLoading} = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const form = e.target
+    const name = form.name.value 
+    const email = form.email.value 
+    const password = form.password.value  
+    const image = form.image.files[0] 
+
+    const formData = new FormData()
+    formData.append('image', image)
+
+    try {
+      setLoading(true)
+
+      const {data} = await axios.post(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+        formData
+      )
+      console.log(data.data.display_url)
+
+      const result = await createUser (email, password)
+      console.log(result)
+
+      await updateUserProfile(name, data.data.display_url)
+      navigate('/')
+      toast.success('Signup Successfully')
+
+
+    }catch(err){
+      console.log(err)
+      toast.error(err.message)
+    }
+  }
   return (
     <div className='flex justify-center items-center min-h-screen'>
       <div className='flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900'>
@@ -9,9 +49,7 @@ const SignUp = () => {
           <h1 className='my-3 text-4xl font-bold'>Sign Up</h1>
           <p className='text-sm text-gray-400'>Welcome to StayVista</p>
         </div>
-        <form
-          noValidate=''
-          action=''
+        <form onSubmit={handleSubmit}
           className='space-y-6 ng-untouched ng-pristine ng-valid'
         >
           <div className='space-y-4'>
@@ -74,10 +112,11 @@ const SignUp = () => {
 
           <div>
             <button
+            disabled={loading}
               type='submit'
               className='bg-rose-500 w-full rounded-md py-3 text-white'
             >
-              Continue
+              {loading ? <TbFidgetSpinner className='animate-spin m-auto' /> : 'Continue'}
             </button>
           </div>
         </form>
