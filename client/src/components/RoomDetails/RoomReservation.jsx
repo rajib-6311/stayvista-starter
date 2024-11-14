@@ -24,11 +24,11 @@ const RoomReservation = ({ room }) => {
       <DateRange
       showDateDisplay={false}
       rangeColors={['#F6536D']}
-  editableDateInputs={true}
-  onChange={item => setState([item.selection])}
-  moveRangeOnFirstSelection={false}
-  ranges={state}
-/>
+      editableDateInputs={true}
+      onChange={item => setState([item.selection])}
+      moveRangeOnFirstSelection={false}
+      ranges={state}
+    />
       </div>
       <hr />
       <div className='p-4'>
