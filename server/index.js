@@ -97,6 +97,13 @@ async function run() {
       res.send(result);
     })
 
+    // Save a room data in db using dashboard form
+    app.post('/room', async (req, res) => {
+      const roomData = req.body 
+      const result = await roomsCollection.insertOne(roomData)
+      res.send(result)
+    })
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
     console.log(

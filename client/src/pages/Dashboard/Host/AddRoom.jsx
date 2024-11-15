@@ -2,14 +2,23 @@ import { useState } from "react";
 import AddRoomForm from "../../../components/Form/AddRoomForm";
 import useAuth from "../../../hooks/useAuth";
 import { imageUpload } from "../../../api/utils";
+import { Helmet } from "react-helmet-async";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 
 const AddRoom = () => {
+    const navigate = useNavigate()
     const {user} = useAuth()
+    const axiosSecure = useAxiosSecure()
+    const [loading, setLoading] = useState(false)
     const [imagePreview, setImagePreview] = useState();
     const [imageText, setImageText] = useState('Upload Image');
     const [dates, setDates] = useState({
-        statDate: new Date(),
-        endDate: null,
+        startDate: new Date(),
+        endDate: new Date(),
         key: 'selection',
     })
 
@@ -19,9 +28,24 @@ const AddRoom = () => {
         setDates(item.selection)
     }
 
+    const {mutateAsync} = useMutation({
+        mutationFn: async roomData => {
+            const {data} = axiosSecure.post(`/room`, roomData)
+            return data
+        },
+        onSuccess: ()=> {
+            console.log('Data Saved Successfully')
+            toast.success('Room added successfully..')
+            navigate('/dashboard/my-listings')
+            setLoading(false)
+        }
+
+    })
+
     // form handel
     const handelSubmit = async e =>{
         e.preventDefault();
+        setLoading(true)
         const form = e.target 
         const location = form.location.value 
         const category = form.category.value 
@@ -58,8 +82,13 @@ const AddRoom = () => {
                 host
             }
             console.table(roomData);
+            // Post request to server
+            await mutateAsync(roomData)
+
         }catch(err){
             console.log(err)
+            toast.error(err.message)
+            setLoading(false)
         }
     }
 
@@ -69,12 +98,11 @@ const AddRoom = () => {
         setImageText(image.name)
     }
     return (
-        <div>
-            {/* <h1>Add Room Page..</h1>
-            <div>
-                {imagePreview && <img src={imagePreview}/>}
-            </div> */}
-
+        <>
+        <Helmet>
+            <title>Add room | Dashboard</title>
+        </Helmet>
+        
         <AddRoomForm
             dates={dates}
             handleDates={handleDates}
@@ -83,9 +111,10 @@ const AddRoom = () => {
             imagePreview={imagePreview}
             handleImage={handleImage}
             imageText={imageText}
+            loading={loading}
 
             />
-        </div>
+        </>
     );
 };
 
