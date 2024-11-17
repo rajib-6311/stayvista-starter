@@ -47,7 +47,7 @@ const Login = () => {
   const handleGoogleSignIn = async () =>{
     try{
      await signInWithGoogle()
-     navigate(from)
+     navigate('/')
       toast.success('Login Successfully')
 
     }catch(err){

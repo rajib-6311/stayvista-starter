@@ -104,6 +104,15 @@ async function run() {
       res.send(result)
     })
 
+    // get all rooms for host
+    app.get('/my-listings/:email', async (req, res) => {
+      const email = req.params.email 
+      let query = {'host.email': email}
+      const result = await roomsCollection.find(query).toArray()
+      res.send(result)
+    })
+   
+  
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
     console.log(
