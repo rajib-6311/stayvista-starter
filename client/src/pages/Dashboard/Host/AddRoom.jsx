@@ -51,7 +51,7 @@ const AddRoom = () => {
         const category = form.category.value 
         const title = form.title.value 
         const to = dates.endDate
-        const from = dates.statDate
+        const from = dates.startDate
         const price = form.price.value 
         const guests = form.total_guest.value 
         const bathrooms = form.bathrooms.value 

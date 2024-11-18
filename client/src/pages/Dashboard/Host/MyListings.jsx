@@ -3,20 +3,20 @@ import { useQuery } from '@tanstack/react-query'
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import useAuth from '../../../hooks/useAuth';
 import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
-
-
+import RoomDataRow from '../../../components/Dashboard/TableRow/RoomDataRow';
 
 const MyListings = () => {
 
     const {user} = useAuth()
     const axiosSecure = useAxiosSecure()
-    const {data: rooms = [], isLoading} = useQuery({
+    const {data: rooms = [], isLoading, refetch} = useQuery({
         queryKey: ['my-listings', user?.email],
         queryFn: async () => {
           const {data} = await axiosSecure.get(`/my-listings/${user?.email}`)
           return data
         },
       })
+
       if (isLoading) return <LoadingSpinner/>
 
   return (
@@ -78,18 +78,10 @@ const MyListings = () => {
                 </thead>
                 <tbody>
                 {/* Room row data */}
-                {/* {
-                    rooms.map(room => {
-                        <p key={room._id}>{room.title}</p>
-                    })  
-                } */}
                 {
                     rooms.map(room => (
-                        <tr key={room._id}>
-                            <td className='px-5 py-3 border-b border-gray-200 bg-white text-sm'>
-                                {room.title}
-                            </td>
-                        </tr>
+                        
+                        <RoomDataRow key={room._id} room={room} refetch={refetch}/>
                     ))
                 }
                 </tbody>
