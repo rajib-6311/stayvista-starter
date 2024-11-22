@@ -98,6 +98,13 @@ async function run() {
         }
       }
 
+      // get a user info by email from db
+      app.get('/user/:email', async (req, res) =>{
+        const email = req.params.email 
+        const result = await usersCollection.findOne({email})
+        res.send(result)
+      })
+
         // Save user for the first time
       const options = {upsert: true}
       const updateDoc = {
