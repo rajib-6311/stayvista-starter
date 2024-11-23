@@ -6,11 +6,13 @@ import { GrUserAdmin } from 'react-icons/gr'
 import { MdHomeWork } from 'react-icons/md'
 import { AiOutlineBars } from 'react-icons/ai'
 import { BsGraphUp } from 'react-icons/bs'
-import { NavLink } from 'react-router-dom'
 import useAuth from '../../../hooks/useAuth'
 import { Link } from 'react-router-dom'
 import useRole from '../../../hooks/useRole'
 import MenuItem from './Manu/MenuItem'
+import HostMenu from './Manu/HostMenu'
+import GuestMenu from './Manu/GuestMenu'
+import AdminMenu from './Manu/AdminMenu'
 
 const Sidebar = () => {
   const { logOut } = useAuth()
@@ -84,18 +86,11 @@ const Sidebar = () => {
                />
               
               {/* Add Room */}
-              <MenuItem
-               label='Add Room'
-                address= 'add-room'
-                icon= {BsFillHouseAddFill}
-               />
-              
+              {role === 'guest' && <GuestMenu/>}
+              {role === 'host' && <HostMenu/>}             
+              {role === 'admin' && <AdminMenu/>}
               {/* My Listing */}
-              <MenuItem
-               label='My Listings'
-                address= 'my-listings'
-                icon= {MdHomeWork}
-               />
+             
               
             </nav>
           </div>
