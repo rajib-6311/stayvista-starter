@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { GrLogout } from 'react-icons/gr'
 import { FcSettings } from 'react-icons/fc'
-import { BsFingerprint,BsFillHouseAddFill } from 'react-icons/bs'
-import { GrUserAdmin } from 'react-icons/gr'
-import { MdHomeWork } from 'react-icons/md'
 import { AiOutlineBars } from 'react-icons/ai'
 import { BsGraphUp } from 'react-icons/bs'
 import useAuth from '../../../hooks/useAuth'
@@ -13,10 +10,13 @@ import MenuItem from './Manu/MenuItem'
 import HostMenu from './Manu/HostMenu'
 import GuestMenu from './Manu/GuestMenu'
 import AdminMenu from './Manu/AdminMenu'
+import ToggleBtn from '../../Shared/Button/ToggleBtn'
+
 
 const Sidebar = () => {
   const { logOut } = useAuth()
   const [isActive, setActive] = useState(false)
+  const [toggle, setToggle] = useState(true)
 
   const [role, isLoading] = useRole()
   console.log(role, isLoading)
@@ -24,6 +24,11 @@ const Sidebar = () => {
   // Sidebar Responsive Handler
   const handleToggle = () => {
     setActive(!isActive)
+  }
+
+  // Toggle Handler
+  const toggleHandler = event => {
+        setToggle(event.target.checked)
   }
   return (
     <>
@@ -74,8 +79,11 @@ const Sidebar = () => {
 
           {/* Nav Items */}
           <div className='flex flex-col justify-between flex-1 mt-6'>
-            {/* Conditional toggle button here.. */}
-
+            {/* Conditional toggle button here.. */}           
+              {role === 'host' && <ToggleBtn 
+              toggleHandler={toggleHandler}
+              toggle={toggle}
+               /> }
             {/*  Menu Items */}
             <nav>
               {/* Statistics */}
@@ -87,18 +95,14 @@ const Sidebar = () => {
               
               {/* Add Room */}
               {role === 'guest' && <GuestMenu/>}
-              {role === 'host' && <HostMenu/>}             
+              {role === 'host' ? toggle? <HostMenu/> : <GuestMenu/> : undefined}             
               {role === 'admin' && <AdminMenu/>}
-              {/* My Listing */}
-             
-              
+              {/* My Listing */}            
             </nav>
           </div>
         </div>
-
         <div>
           <hr />
-
           {/* Profile Menu */}
           <MenuItem
                label='Profile'
