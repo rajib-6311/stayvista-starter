@@ -10,13 +10,13 @@ const LoadingSpinner = ({ smallHeight }) => {
       justify-center 
       items-center `}
     >
-      <ScaleLoader size={100} color='red' />
+      <ScaleLoader size={100} color='red' />  
     </div>
   )
 }
 
 LoadingSpinner.propTypes = {
-  smallHeight: PropTypes.bool,
+  smallHeight: PropTypes.bool,  
 }
 
 export default LoadingSpinner

@@ -1,32 +1,13 @@
 import { Helmet } from 'react-helmet-async'
-import useAxiosSecure from '../../../hooks/useAxiosSecure'
-import { useQuery } from '@tanstack/react-query'
-import LoadingSpinner from '../../../components/Shared/LoadingSpinner'
-import UserDataRow from '../../../components/Dashboard/TableRow/UserDataRow'
 
-
-const ManageUsers = () => {
-    const axiosSecure = useAxiosSecure()
-    // Fetch users data
-    const {
-        data: users = [],
-        isLoading,
-        refetch,
-    } = useQuery({
-        queryKey: ['users'],
-        queryFn: async () =>{
-            const {data} = await axiosSecure(`/users`)
-            return data
-        },
-    })
-  console.log(users)
-      if(isLoading) return <LoadingSpinner/>
+const MyBookings = () => {
   return (
     <>
+      <Helmet>
+        <title>My Bookings</title>
+      </Helmet>
+
       <div className='container mx-auto px-4 sm:px-8'>
-        <Helmet>
-          <title>Manage Users</title>
-        </Helmet>
         <div className='py-8'>
           <div className='-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto'>
             <div className='inline-block min-w-full shadow rounded-lg overflow-hidden'>
@@ -37,21 +18,32 @@ const ManageUsers = () => {
                       scope='col'
                       className='px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal'
                     >
-                      Email
+                      Title
                     </th>
                     <th
                       scope='col'
                       className='px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal'
                     >
-                      Role
+                      Info
                     </th>
                     <th
                       scope='col'
                       className='px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal'
                     >
-                      Status
+                      Price
                     </th>
-
+                    <th
+                      scope='col'
+                      className='px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal'
+                    >
+                      From
+                    </th>
+                    <th
+                      scope='col'
+                      className='px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal'
+                    >
+                      To
+                    </th>
                     <th
                       scope='col'
                       className='px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal'
@@ -60,14 +52,7 @@ const ManageUsers = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
-
-                 {
-                    users.map(user =>(
-                        <UserDataRow key={user?._id} user={user} refetch={refetch}/>
-                    ))
-                 }
-                </tbody>
+                <tbody>{/* Table Row Data */}</tbody>
               </table>
             </div>
           </div>
@@ -77,4 +62,4 @@ const ManageUsers = () => {
   )
 }
 
-export default ManageUsers
+export default MyBookings
