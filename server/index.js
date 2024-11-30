@@ -221,15 +221,38 @@ async function run() {
       // save room availability status
       const result = await bookingsCollection.insertOne(bookingData)
 
+      // // change room availability status
+      // const roomId = bookingData.roomId
+      // const query = {_id: new ObjectId(roomId)}
+      // const updateDoc = {
+      //   $set: {booked: true},
+      // }
+      // const updateRoom = await roomsCollection.updateOne(query, updateDoc)
+      // console.log(updateDoc)
+      // res.send({result, updateRoom})
+      res.send(result)
+    })
+
+    // Update Room Status
+    app.patch('/room/status/:id', async (req, res) => {
+      const id = req.params.id 
+      const status = req.body.status
+
       // change room availability status
-      const roomId = bookingData.roomId
-      const query = {_id: new ObjectId(roomId)}
+      const query = {_id: new ObjectId(id)}
       const updateDoc = {
-        $set: {booked: true},
+        $set: {booked: status},
       }
-      const updateRoom = await roomsCollection.updateOne(query, updateDoc)
-      console.log(updateDoc)
-      res.send({result, updateRoom})
+      const result = await roomsCollection.updateOne(query, updateDoc)
+      res.send(result)
+    })
+
+    // get all booking for a guest
+    app.get('/my-bookings/:email', verifyToken, async (req, res) =>{
+      const email = req.params.email
+      const query = {'guest.email': email}
+      const result = await bookingsCollection.find(query).toArray()
+      res.send(result)
     })
      
   

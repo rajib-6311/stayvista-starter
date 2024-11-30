@@ -9,6 +9,8 @@ const MyListings = () => {
 
     const {user} = useAuth()
     const axiosSecure = useAxiosSecure()
+    // Fetch room data
+
     const {data: rooms = [], isLoading, refetch} = useQuery({
         queryKey: ['my-listings', user?.email],
         queryFn: async () => {
