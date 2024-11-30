@@ -49,8 +49,10 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const roomsCollection = client.db('stayvista').collection('rooms')
-    const usersCollection = client.db('stayvista').collection('users')
+    const db = client.db('stayvista')
+    const roomsCollection = db.collection('rooms')
+    const usersCollection = db.collection('users')
+    const bookingsCollection = db.collection('booking')
 
     // Verify admin tokens
     const verifyAdmin = async (req, res, next) => {
@@ -211,6 +213,23 @@ async function run() {
       let query = {'host.email': email}
       const result = await roomsCollection.find(query).toArray()
       res.send(result)
+    })
+
+     // Save a bookings data in db using dashboard form
+     app.post('/booking', verifyToken, async (req, res) => {
+      const bookingData = req.body 
+      // save room availability status
+      const result = await bookingsCollection.insertOne(bookingData)
+
+      // change room availability status
+      const roomId = bookingData.roomId
+      const query = {_id: new ObjectId(roomId)}
+      const updateDoc = {
+        $set: {booked: true},
+      }
+      const updateRoom = await roomsCollection.updateOne(query, updateDoc)
+      console.log(updateDoc)
+      res.send({result, updateRoom})
     })
      
   
