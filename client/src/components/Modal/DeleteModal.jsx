@@ -78,6 +78,8 @@ import {
   DeleteModal.propTypes = {
     closeModal: PropTypes.func,
     isOpen: PropTypes.bool,
+    handelDelete: PropTypes.func,
+    id: PropTypes.string,
   }
   
   export default DeleteModal
