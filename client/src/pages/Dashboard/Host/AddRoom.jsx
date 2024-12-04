@@ -16,6 +16,8 @@ const AddRoom = () => {
     const [loading, setLoading] = useState(false)
     const [imagePreview, setImagePreview] = useState();
     const [imageText, setImageText] = useState('Upload Image');
+
+    
     const [dates, setDates] = useState({
         startDate: new Date(),
         endDate: new Date(),

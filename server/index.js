@@ -3,6 +3,7 @@ const app = express()
 require('dotenv').config()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const nodemailer = require("nodemailer");
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
@@ -19,6 +20,46 @@ app.use(cors(corsOptions))
 
 app.use(express.json())
 app.use(cookieParser())
+
+// Send email
+const sendEmail = (emailAddress, emailData) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.TRANSPORTER_EMAIL,
+      pass: process.env.TRANSPORTER_PASS,
+    },
+  })
+
+  // Verify transporter
+  transporter.verify(function (error, success){
+    if(error){
+      console.log(error)
+    }
+    else{
+      console.log('Server is ready to take our message')
+    }
+  })
+
+  const mailBody = {
+    from: `"StayVista" <${process.env.TRANSPORTER_EMAIL}>`,
+    to: emailAddress,
+    subject: emailData.subject,
+    html: emailData.message,
+  }
+
+  transporter.sendMail(mailBody, (error, info) => {
+    if(error){
+      console.log(error)
+    }
+    else{
+      console.log('Email Sent:' + info.response)
+    }
+  })
+}
 
 // Verify Token Middleware
 const verifyToken = async (req, res, next) => {
@@ -147,6 +188,12 @@ async function run() {
         },
       }
       const result = await usersCollection.updateOne(query, updateDoc, options)
+      // Welcome new user
+      sendEmail(user?.email, {
+        subject: 'Welcome to StayVista!',
+        message: `Hope you will find you destination`
+      })
+
       res.send(result) 
     })
 
@@ -220,6 +267,19 @@ async function run() {
       const bookingData = req.body 
       // save room availability status
       const result = await bookingsCollection.insertOne(bookingData)
+     
+      // send email to guest
+      sendEmail(bookingData?.guest?.email, {
+        subject: 'Booking Successful!',
+        message: `You've successfully booked a room through StayVista.
+        Transaction Id: ${bookingData.transactionId}
+        `
+      })
+      // send email to host
+      sendEmail(bookingData?.host?.email, {
+        subject: 'Your room got booked!',
+        message: `Get ready to welcome ${bookingData.guest.name}`,
+      })
 
       // // change room availability status
       // const roomId = bookingData.roomId
@@ -262,6 +322,18 @@ async function run() {
       res.send(result)
     })
 
+    // Update room data 
+    app.put('/room/update/:id', verifyToken, verifyHost, async (req, res)=>{
+      const id = req.params.id 
+      const roomData = req.body 
+      const query = {_id: new ObjectId(id)}
+      const updateDoc = {
+        $set: roomData,
+      }
+      const result = await roomsCollection.updateOne(query, updateDoc)
+      res.send(result)
+    })
+
      // Delete a booking
      app.delete('/booking/:id', verifyToken, async (req, res) => {
       const id = req.params.id 
@@ -271,7 +343,7 @@ async function run() {
     })
 
     // Admin Statistics
-    app.get('/admin-stat', async (req, res) =>{
+    app.get('/admin-stat', verifyToken, verifyAdmin, async (req, res) =>{
       const bookingDetails = await bookingsCollection.find({},
         {
           projection:{
@@ -307,10 +379,91 @@ async function run() {
         chatData,
       })
     })
-     
-  
-    // Send a ping to confirm a successful connection
-    await client.db('admin').command({ ping: 1 })
+    // Host Statistics
+    app.get('/host-stat', verifyToken, verifyHost, async (req, res) =>{
+      const {email} = req.user 
+      const bookingDetails = await bookingsCollection.find(
+        {'host.email': email},
+        {
+          projection:{
+            date: 1,
+            price:1,
+          },
+        }
+      )
+      .toArray()
+
+      
+      const totalRooms = await roomsCollection.countDocuments({
+        'host.email': email,
+      })
+      const totalPrice =  bookingDetails.reduce(
+        (sum, booking) => sum +booking.price,
+        0 
+      )
+      const {timestamp} = await usersCollection.findOne(
+        {email},
+        {projection: {timestamp: 1}}
+      )
+
+      const chatData = bookingDetails.map(booking => {
+        const day = new Date(booking.date).getDate()
+        const month = new Date(booking.date).getMonth() +1
+        const data = [`${day}/${month}`, booking?.price]
+        return data
+      })
+      chatData.unshift(['Day', 'Sales'])
+      // chatData.splice(0,0,['Day', 'Sales'])
+      console.log(chatData)
+      console.log(bookingDetails)
+      res.send({
+        totalRooms,
+        totalPrice,
+        totalBookings: bookingDetails.length,
+        chatData,
+        hostSince: timestamp,
+      })
+    })
+    // Guest Statistics
+    app.get('/guest-stat', verifyToken, async (req, res) =>{
+      const {email} = req.user 
+      const bookingDetails = await bookingsCollection.find(
+        {'guest.email': email},
+        {
+          projection:{
+            date: 1,
+            price:1,
+          },
+        }
+      )
+      .toArray()
+      const totalPrice =  bookingDetails.reduce(
+        (sum, booking) => sum +booking.price,
+        0 
+      )
+      const {timestamp} = await usersCollection.findOne(
+        {email},
+        {projection: {timestamp: 1}}
+      )
+
+      const chatData = bookingDetails.map(booking => {
+        const day = new Date(booking.date).getDate()
+        const month = new Date(booking.date).getMonth() +1
+        const data = [`${day}/${month}`, booking?.price]
+        return data
+      })
+      chatData.unshift(['Day', 'Sales'])
+      // chatData.splice(0,0,['Day', 'Sales'])
+      console.log(chatData)
+      console.log(bookingDetails)
+      res.send({
+        totalPrice,
+        totalBookings: bookingDetails.length,
+        chatData,
+        guestSince: timestamp,
+      })
+    })
+    
     console.log(
       'Pinged your deployment. You successfully connected to MongoDB!'
     )
