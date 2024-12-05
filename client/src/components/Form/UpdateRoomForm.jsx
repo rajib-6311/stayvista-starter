@@ -5,9 +5,9 @@ import { DateRange } from 'react-date-range';
 const UpdateRoomForm = ({
     handleSubmit, 
     handleImage,
-     roomData, 
-     setRoomData,
-     handleDates,
+    roomData, 
+    setRoomData,
+    handleDates,
      dates,
     }) => {
 
@@ -198,6 +198,7 @@ const UpdateRoomForm = ({
 UpdateRoomForm.propTypes = {
     handleSubmit: PropTypes.func,
     roomData: PropTypes.object,
+    handleImage: PropTypes.func,
     
   }
 
