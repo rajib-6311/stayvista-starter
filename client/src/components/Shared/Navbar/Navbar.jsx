@@ -45,19 +45,19 @@ const Navbar = () => {
   }
 
   return (
-    <div className='fixed w-full bg-white z-10 shadow-sm'>
-      <div className='py-4 border-b-[1px]'>
+    <div className='fixed w-full bg-gray-100 z-10 shadow-sm'>
+      <div className='py-6 border-b-[1px]'>
         <Container>
           <div className='flex flex-row  items-center justify-between gap-3 md:gap-0'>
             {/* Logo */}
             <Link to='/'>
-              <img
-                // className='hidden md:block'
+            <h1 className='text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text inline-block'>LuxuriousLodge</h1>
+              {/* <img
                 src='https://i.ibb.co/4ZXzmq5/logo.png'
                 alt='logo'
                 width='100'
                 height='100'
-              />
+              /> */}
             </Link>
             {/* Dropdown Menu */}
             <div className='relative'>
